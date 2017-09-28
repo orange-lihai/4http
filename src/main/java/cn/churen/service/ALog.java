@@ -7,8 +7,9 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 public @interface ALog {
-  String message() default "";
+  String log() default "";
+  String logLevel() default "INFO";
 
   String[] before() default {};
-  String[] end() default {};
+  String[] after() default {};
 }
