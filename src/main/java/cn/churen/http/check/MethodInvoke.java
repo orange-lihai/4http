@@ -20,14 +20,14 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CheckMethodInvoke {
-  public static final Logger logger = Grizzly.logger(CheckMethodInvoke.class);
-  private static CheckMethodInvoke _this;
+public class MethodInvoke {
+  public static final Logger logger = Grizzly.logger(MethodInvoke.class);
+  private static MethodInvoke _this;
   private static Map<String, ControllerMethod> controllerMethodMap = new HashMap<>();
   private static Map<String, Object> serviceNameMap = new HashMap<>();
   private static Map<Class, Object> serviceClazzMap = new HashMap<>();
 
-  private CheckMethodInvoke() {
+  private MethodInvoke() {
     matchAllControllerMethod();
   }
   private Map<String, ControllerMethod> matchAllControllerMethod() {
@@ -87,11 +87,11 @@ public class CheckMethodInvoke {
     return (T) serviceClazzMap.get(tClass);
   }
 
-  public static CheckMethodInvoke getInstance() {
+  public static MethodInvoke getInstance() {
     if (null == _this) {
-      synchronized (CheckMethodInvoke.class) {
+      synchronized (MethodInvoke.class) {
         if (null == _this) {
-          _this = new CheckMethodInvoke();
+          _this = new MethodInvoke();
         }
       }
     }

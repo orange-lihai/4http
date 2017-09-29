@@ -1,4 +1,4 @@
-package cn.churen.crud.action;
+package cn.churen.dao.crud.action;
 
 public class MySQLAction<T> extends AbstractAction<T> {
   @Override public T queryOneByPK(T table, String... keys) {

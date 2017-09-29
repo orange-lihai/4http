@@ -37,8 +37,8 @@ public class IndexHandler extends HttpHandler {
       return;
     }
 
-    CheckMethodInvoke checkMethodInvoke = CheckMethodInvoke.getInstance();
-    Result<ControllerMethod> methodInvokeResult = checkMethodInvoke.check(request);
+    MethodInvoke methodInvoke = MethodInvoke.getInstance();
+    Result<ControllerMethod> methodInvokeResult = methodInvoke.check(request);
     if (!methodInvokeResult.success) {
       writeResponse(response, methodInvokeResult);
       return;

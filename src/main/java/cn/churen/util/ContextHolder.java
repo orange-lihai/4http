@@ -5,7 +5,6 @@ import com.google.common.base.Supplier;
 import org.glassfish.grizzly.Grizzly;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -18,6 +17,7 @@ public class ContextHolder {
     ;
     RC(String dataSource) {}
   }
+
   private static final ThreadLocal<Map<String, Object>> context = new ThreadLocal<>();
   private static Logger logger = Grizzly.logger(ContextHolder.class);
 
@@ -79,7 +79,7 @@ public class ContextHolder {
 
 
   // special context objects
-  public static Connection getConnection() throws SQLException {
+  public static Connection getConnection() {
     Connection conn = null;
     try {
       conn = ContextHolder.get(ContextHolder.RC.DATA_SOURCE.name(), Connection.class);
@@ -97,7 +97,7 @@ public class ContextHolder {
   public static void rollbackConnection() {
     try {
       Connection conn = getConnection();
-      if (null != conn && !conn.isClosed()) {
+      if (null != conn && conn.isClosed()) {
         conn.rollback();
         conn.close();
       }

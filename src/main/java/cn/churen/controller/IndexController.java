@@ -13,9 +13,9 @@ public class IndexController implements IController {
   @AInjection private IndexService indexService;
 
   @AControllerMapping(uri = "/")
-  public String index(HashMap<String, String> params
+  public Object index(HashMap<String, String> params
     , Integer id
   ) {
-    return indexService.getIndexMessage(null);
+    return indexService.getIndexMessage();
   }
 }

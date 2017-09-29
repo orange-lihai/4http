@@ -1,4 +1,4 @@
-package cn.churen.crud.table;
+package cn.churen.dao.crud.table;
 
 import java.lang.annotation.*;
 

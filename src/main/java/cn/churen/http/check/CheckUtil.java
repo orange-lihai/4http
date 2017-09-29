@@ -30,7 +30,7 @@ public class CheckUtil {
   public static Object createInstance(Class<?> clazz) {
     Object o = null;
     try {
-      o = CheckMethodInvoke.getServiceClazzMap(clazz);
+      o = MethodInvoke.getServiceClazzMap(clazz);
       if (null == o) {
         if (clazz.isAnnotationPresent(AController.class)) {
           o = clazz.newInstance();
@@ -52,8 +52,8 @@ public class CheckUtil {
             f.set(o, fo);
           }
         }
-        CheckMethodInvoke.setServiceClazzMap(clazz, o);
-        CheckMethodInvoke.setServiceNameMap(clazz.getSimpleName(), o);
+        MethodInvoke.setServiceClazzMap(clazz, o);
+        MethodInvoke.setServiceNameMap(clazz.getSimpleName(), o);
       }
     } catch (Exception ex) {
       ex.printStackTrace();

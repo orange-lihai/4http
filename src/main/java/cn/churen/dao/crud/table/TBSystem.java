@@ -1,7 +1,7 @@
-package cn.churen.crud.table;
+package cn.churen.dao.crud.table;
 
 @ATable(name = "tb_system")
-public class TBSystem {
+public class TBSystem implements ITable {
   private String id;
   private String ename;
   @ATableColumn(name = "show_name") private String showName;
