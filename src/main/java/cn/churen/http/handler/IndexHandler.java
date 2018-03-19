@@ -6,12 +6,15 @@ import cn.churen.http.result.ResultCode;
 import cn.churen.util.ContextHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sun.deploy.util.StringUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.grizzly.Grizzly;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,10 +23,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class IndexHandler extends HttpHandler {
-  public static final Logger logger = Grizzly.logger(IndexHandler.class);
+  private static final Logger logger = Grizzly.logger(IndexHandler.class);
 
   @Override public void service(Request request, Response response) throws Exception {
     ContextHolder.clear();
+
+    response.setHeader("Access-Control-Allow-Credentials", "true");
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Headers"
+        , "Origin, X-Requested-With, Content-Type, Accept, Cookie, userToken");
+
+    Result<CheckStaticFile.StaticFile> staticFileCheckResult = CheckStaticFile.check(request);
+    if (staticFileCheckResult.data.isStaticFile) {
+      writeResponse(response, staticFileCheckResult.data);
+      return;
+    }
 
     Result<Boolean> httpCheckResult = CheckHTTP.check(request);
     if (!httpCheckResult.success) {
@@ -61,6 +75,22 @@ public class IndexHandler extends HttpHandler {
     }
   }
 
+  private void writeResponse(Response response, CheckStaticFile.StaticFile staticFile
+  ) throws IOException {
+    response.setContentType(staticFile.contentType);
+    String fileString = "file not found!!!";
+    try {
+      fileString = IOUtils.toString(
+          new FileInputStream(new File("./src/main/web/" + staticFile.fileFullName))
+          , "utf-8"
+      );
+    } catch (Exception ex) {
+      logger.log(Level.SEVERE, ex.getMessage(), ex);
+    }
+    response.getWriter().write(fileString);
+    response.flush();
+  }
+
   private <D> void writeResponse(Response response, Result<D> result) throws IOException {
     response.setContentType("application/json");
     Gson gson = new GsonBuilder().create();
@@ -83,12 +113,19 @@ public class IndexHandler extends HttpHandler {
     String contentType = request.getContentType();
     int len = request.getContentLength();
     if (len >= 1024 * 10) { throw new IOException("ContentLength is too big!!!"); }
-    char buf[] = new char[len];
-    if (CheckUtil.isRaw(contentType)) {
-      request.getReader().read(buf);
-      return String.valueOf(buf);
+    if (len > 0) {
+      char buf[] = new char[len];
+      if (CheckUtil.isRaw(contentType)) {
+        int n = request.getReader().read(buf);
+        if (n >= 0) {
+          logger.log(Level.INFO, "content length: " + n);
+        }
+        return String.valueOf(buf);
+      } else {
+        return "{}";
+      }
     } else {
-      return "";
+      return "{}";
     }
   }
 }

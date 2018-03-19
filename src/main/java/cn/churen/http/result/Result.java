@@ -11,6 +11,11 @@ public class Result<R> {
     this.resultCode = ResultCode.REQUEST_OK;
   }
 
+  public Result(boolean success, R data) {
+    this.success = true;
+    this.data = data;
+  }
+
   public Result(boolean success) {
     this.success = success;
     this.resultCode = success ? ResultCode.REQUEST_OK : ResultCode.REQUEST_ERROR;

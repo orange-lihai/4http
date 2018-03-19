@@ -27,7 +27,7 @@ public class Application {
     final ServerConfiguration config = httpServer.getServerConfiguration();
     config.setJmxEnabled(jmxEnabled);
 
-    config.addHttpHandler(new IndexHandler(), "/");
+    config.addHttpHandler(new IndexHandler()); // all url matched ...
 
     final NetworkListener networkListener = new NetworkListener(
         listenerName,
@@ -60,7 +60,7 @@ public class Application {
 
   public static void main(String[] args) {
     // ResourceBundle logProp = ResourceBundle.getBundle("config/application-log");
-    ResourceBundle mainProp = ResourceBundle.getBundle("application");
+    ResourceBundle mainProp = ResourceBundle.getBundle("config/application");
     ResourceBundle dbProp = ResourceBundle.getBundle("config/application-db");
     
     final HttpServer httpServer = initHttpServer(mainProp);

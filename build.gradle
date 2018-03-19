@@ -1,35 +1,56 @@
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'application'
 
+task copyConfigFiles(type: Copy) {
+  from("src/main/resources/config/")
+  into("$buildDir/config")
+}
+task copyReadMeFile {
+  outputs.file new File("$buildDir/README.md")
+  doLast {
+    copy {
+      from "README.md"
+      into "$buildDir"
+    }
+  }
+}
+applicationDistribution.from(copyReadMeFile) { into("") }
+applicationDistribution.from(copyConfigFiles) { into("config") }
+
+
+mainClassName = 'cn.churen.Application'
 sourceCompatibility = 1.8
 version = '1.0'
 
 repositories {
-    mavenLocal()
-    maven { url "http://10.202.202.185:8081/nexus/content/groups/public/" }
-    maven { url "http://maven.oschina.net/content/groups/public/" }
-    mavenCentral()
+  mavenLocal()
+  maven { url "http://maven.oschina.net/content/groups/public/" }
+  mavenCentral()
 }
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
 dependencies {
-    compile 'org.glassfish.grizzly:grizzly-http-server:2.4.0'
-    compile  'mysql:mysql-connector-java:5.1.38'
+  compile 'org.glassfish.grizzly:grizzly-http-server:2.4.0'
+  compile  'mysql:mysql-connector-java:5.1.38'
 
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
-    // https://mvnrepository.com/artifact/org.reflections/reflections
-    compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
-    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
-    compile group: 'com.zaxxer', name: 'HikariCP', version: '2.7.1'
-    // https://mvnrepository.com/artifact/com.google.guava/guava
-    compile group: 'com.google.guava', name: 'guava', version: '23.0'
-    // https://mvnrepository.com/artifact/cglib/cglib
-    compile group: 'cglib', name: 'cglib', version: '3.2.5'
+  // https://mvnrepository.com/artifact/com.google.code.gson/gson
+  compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
+  // https://mvnrepository.com/artifact/org.reflections/reflections
+  compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
+  // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
+  // https://mvnrepository.com/artifact/commons-io/commons-io
+  compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
+  // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+  compile group: 'com.zaxxer', name: 'HikariCP', version: '2.7.1'
+  // https://mvnrepository.com/artifact/com.google.guava/guava
+  compile group: 'com.google.guava', name: 'guava', version: '23.0'
+  // https://mvnrepository.com/artifact/cglib/cglib
+  compile group: 'cglib', name: 'cglib', version: '3.2.5'
 
-    // testCompile group: 'junit', name: 'junit', version: '4.11'
+  // testCompile group: 'junit', name: 'junit', version: '4.11'
 }
+

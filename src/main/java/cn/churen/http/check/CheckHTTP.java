@@ -5,7 +5,7 @@ import cn.churen.http.result.ResultCode;
 import org.glassfish.grizzly.http.Method;
 import org.glassfish.grizzly.http.server.Request;
 
-public class CheckHTTP implements Check {
+public class CheckHTTP implements ICheck {
 
   public static Result<Boolean> check(Request request) {
     String url = request.getRequestURI();

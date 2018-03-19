@@ -7,9 +7,19 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 public class BUtil {
+
+  public static Map<String, String> toMap(String... keysAndValues) {
+    Map<String, String> r = new HashMap<>();
+    for (int i = 0; null != keysAndValues && i < keysAndValues.length; i += 2) {
+      r.put(keysAndValues[i], keysAndValues[i + 1]);
+    }
+    return r;
+  }
+
   public static <T> Map<String, Object> beanToMap(T bean) {
     Map<String, Object> map = Maps.newHashMap();
     if (bean != null) {

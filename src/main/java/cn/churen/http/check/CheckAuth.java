@@ -6,7 +6,7 @@ import org.glassfish.grizzly.http.server.Request;
 
 import java.util.Map;
 
-public class CheckAuth implements Check {
+public class CheckAuth implements ICheck {
 
   public static Result<Boolean> check(Request request) {
     String oath = request.getAuthorization();
