@@ -15,9 +15,11 @@ task copyReadMeFile {
     }
   }
 }
+
+applicationName="churenBiz"
+applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
 applicationDistribution.from(copyReadMeFile) { into("") }
 applicationDistribution.from(copyConfigFiles) { into("config") }
-
 
 mainClassName = 'cn.churen.Application'
 sourceCompatibility = 1.8
