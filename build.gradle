@@ -21,7 +21,7 @@ applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
 applicationDistribution.from(copyReadMeFile) { into("") }
 applicationDistribution.from(copyConfigFiles) { into("config") }
 
-mainClassName = 'cn.churen.Application'
+mainClassName = 'cn.churen.biz.Application'
 sourceCompatibility = 1.8
 version = '1.0'
 
