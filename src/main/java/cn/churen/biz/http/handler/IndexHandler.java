@@ -2,28 +2,23 @@ package cn.churen.biz.http.handler;
 
 import cn.churen.biz.http.check.*;
 import cn.churen.biz.http.result.Result;
-import cn.churen.biz.http.result.ResultCode;
 import cn.churen.biz.util.ContextHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.glassfish.grizzly.Grizzly;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+@Slf4j
 public class IndexHandler extends HttpHandler {
-  private static final Logger logger = Grizzly.logger(IndexHandler.class);
 
   @Override public void service(Request request, Response response) throws Exception {
     ContextHolder.clear();
@@ -51,28 +46,20 @@ public class IndexHandler extends HttpHandler {
       return;
     }
 
-    MethodInvoke methodInvoke = MethodInvoke.getInstance();
-    Result<ControllerMethod> methodInvokeResult = methodInvoke.check(request);
-    if (!methodInvokeResult.success) {
-      writeResponse(response, methodInvokeResult);
-      return;
-    }
-
-    Result<Object> r = new Result<>(true);
-    try {
+    Result<Object> r = Result.build(() -> {
+      MethodInvoke methodInvoke = MethodInvoke.getInstance();
+      Result<ControllerMethod> methodInvokeResult = methodInvoke.check(request);
+      if (!methodInvokeResult.success) {
+        return methodInvokeResult;
+      }
       ControllerMethod m = methodInvokeResult.data;
       Map<String, String> allRequestParams = getParameters(request);
       String jsonOrXmlEtc = getRaw(request);
 
       Object[] params = m.matchParameters(allRequestParams, jsonOrXmlEtc);
-      r.data = m.getMethod().invoke(m.getClazzInstance(), params);
-      r.success = true;
-    } catch (Exception ex) {
-      logger.log(Level.SEVERE, ex.getMessage(), ex);
-      r = new Result<>(false, ResultCode.REQUEST_ERROR, ex.getMessage());
-    } finally {
-      writeResponse(response, r);
-    }
+      return m.getMethod().invoke(m.getClazzInstance(), params);
+    });
+    writeResponse(response, r);
   }
 
   private void writeResponse(Response response, CheckStaticFile.StaticFile staticFile
@@ -81,11 +68,11 @@ public class IndexHandler extends HttpHandler {
     String fileString = "file not found!!!";
     try {
       fileString = IOUtils.toString(
-          new FileInputStream(new File("./src/main/web/" + staticFile.fileFullName))
+          this.getClass().getClassLoader().getResourceAsStream("web/" + staticFile.fileFullName)
           , "utf-8"
       );
     } catch (Exception ex) {
-      logger.log(Level.SEVERE, ex.getMessage(), ex);
+      log.error(ex.getMessage(), ex);
     }
     response.getWriter().write(fileString);
     response.flush();
@@ -118,7 +105,7 @@ public class IndexHandler extends HttpHandler {
       if (CheckUtil.isRaw(contentType)) {
         int n = request.getReader().read(buf);
         if (n >= 0) {
-          logger.log(Level.INFO, "content length: " + n);
+          log.error("content length: " + n);
         }
         return String.valueOf(buf);
       } else {
