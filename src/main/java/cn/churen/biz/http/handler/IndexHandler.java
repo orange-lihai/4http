@@ -13,6 +13,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class IndexHandler extends HttpHandler {
 
     Result<CheckStaticFile.StaticFile> staticFileCheckResult = CheckStaticFile.check(request);
     if (staticFileCheckResult.data.isStaticFile) {
-      writeResponse(response, staticFileCheckResult.data);
+      writeResponse(request, response, staticFileCheckResult.data);
       return;
     }
 
@@ -62,17 +63,22 @@ public class IndexHandler extends HttpHandler {
     writeResponse(response, r);
   }
 
-  private void writeResponse(Response response, CheckStaticFile.StaticFile staticFile
+  private void writeResponse(Request request, Response response, CheckStaticFile.StaticFile staticFile
   ) throws IOException {
     response.setContentType(staticFile.contentType);
     String fileString = "file not found!!!";
+    InputStream is = null;
     try {
-      fileString = IOUtils.toString(
-          this.getClass().getClassLoader().getResourceAsStream("web/" + staticFile.fileFullName)
-          , "utf-8"
-      );
+      is = this.getClass().getClassLoader().getResourceAsStream("web/" + staticFile.fileFullName);
+      if (null == is) {
+        fileString = PageGenerator.generatePage(request);
+      } else {
+        fileString = IOUtils.toString(is, "utf-8");
+      }
     } catch (Exception ex) {
       log.error(ex.getMessage(), ex);
+    } finally {
+      if (null != is) { is.close(); }
     }
     response.getWriter().write(fileString);
     response.flush();
@@ -86,33 +92,45 @@ public class IndexHandler extends HttpHandler {
     response.flush();
   }
 
-  private Map<String, String> getParameters(Request request) {
-    Map<String, String> map = new HashMap<>();
-    Map<String, String[]> parameters = request.getParameterMap();
-    for (String k : parameters.keySet()) {
-      String[] v = parameters.get(k);
-      map.put(k, StringUtils.join(Arrays.asList(v), ""));
+  public static Map<String, String> getParameters(Request request) {
+    Map<String, String> map = ContextHolder.get(ContextHolder.RC.PARAMETER.name(), Map.class);
+    if (null == map) {
+      map = new HashMap<>();
+      Map<String, String[]> parameters = request.getParameterMap();
+      for (String k : parameters.keySet()) {
+        String[] v = parameters.get(k);
+        map.put(k, StringUtils.join(Arrays.asList(v), ""));
+      }
+      ContextHolder.set(ContextHolder.RC.PARAMETER.name(), map);
     }
     return map;
   }
 
-  private String getRaw(Request request) throws IOException {
-    String contentType = request.getContentType();
-    int len = request.getContentLength();
-    if (len >= 1024 * 10) { throw new IOException("ContentLength is too big!!!"); }
-    if (len > 0) {
-      char buf[] = new char[len];
-      if (CheckUtil.isRaw(contentType)) {
-        int n = request.getReader().read(buf);
-        if (n >= 0) {
-          log.error("content length: " + n);
+  public static String getRaw(Request request) {
+    String raw = ContextHolder.getOrDefault(ContextHolder.RC.RAW.name(), String.class, "{}");
+    try {
+      if (StringUtils.isBlank(raw)) {
+        String contentType = request.getContentType();
+        int len = request.getContentLength();
+        if (len >= 1024 * 10) {
+          throw new IOException("ContentLength is too big!!!");
         }
-        return String.valueOf(buf);
-      } else {
-        return "{}";
+        if (len > 0) {
+          char buf[] = new char[len];
+          if (CheckUtil.isRaw(contentType)) {
+            request.getReader().read(buf);
+            raw = String.valueOf(buf);
+          } else {
+            raw = "{}";
+          }
+        } else {
+          raw = "{}";
+        }
       }
-    } else {
-      return "{}";
+    } catch (Exception ex) {
+      raw = "{}";
+      log.error(ex.getMessage(), ex);
     }
+    return raw;
   }
 }

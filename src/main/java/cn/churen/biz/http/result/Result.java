@@ -47,7 +47,10 @@ public class Result<R> {
   public static <R> Result<R> build(ASupplier<R> supplier) {
     Result<R> r = new Result<>(false, ResultCode.SYS_INIT);
     try {
-      r.data = supplier.get();
+      R _r = supplier.get();
+      if (_r.getClass().isAssignableFrom(r.getClass())) {
+        return (Result<R>) _r;
+      }
       r = new Result<>(true, ResultCode.REQUEST_OK, "success");
     } catch (Throwable throwable) {
       r = new Result<>(true, ResultCode.REQUEST_ERROR, throwable.getMessage());

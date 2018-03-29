@@ -5,6 +5,7 @@ import cn.churen.biz.service.ADao;
 import cn.churen.biz.service.AResultType;
 import cn.churen.biz.service.ASql;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,5 +17,15 @@ public class TableDao {
   public <T> List<T> queryList(@ASql String sql, @AResultType Class<T> clazz) {
     log.debug(sql);
     return new ArrayList<>();
+  }
+
+  public <T> T queryOne(String sql, Class<T> clazz) {
+    log.debug(sql);
+    List<T> list = queryList(sql, clazz);
+    if (CollectionUtils.isNotEmpty(list) && list.size() > 0) {
+      return list.get(0);
+    } else {
+      return null;
+    }
   }
 }

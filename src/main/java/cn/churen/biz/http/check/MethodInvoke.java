@@ -103,6 +103,9 @@ public class MethodInvoke {
     try {
       String uri = request.getRequestURI();
       r.data = matchControllerMethod(uri);
+      if(null == r.data) {
+        throw new Exception("uri => "+ uri +", controller method not found!!!");
+      }
       r.resultCode = ResultCode.METHOD_INVOKE_OK;
     } catch (Exception ex) {
       logger.log(Level.SEVERE, ex.getMessage(), ex);

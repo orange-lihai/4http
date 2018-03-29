@@ -13,8 +13,10 @@ import java.util.logging.Logger;
 public class ContextHolder {
   public enum RC {
     DATA_SOURCE("dataSource"),
-    TRANSACTION("Transaction")
-    ;
+    TRANSACTION("Transaction"),
+    PARAMETER("parameter"),
+    RAW("parameter"),
+    MODULE_ID("moduleId");
     RC(String dataSource) {}
   }
 

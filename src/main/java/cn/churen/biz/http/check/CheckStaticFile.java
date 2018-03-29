@@ -26,7 +26,7 @@ public class CheckStaticFile implements ICheck {
 
   public static Result<StaticFile> check(Request request) {
     String fileFullName = fileFullName(request);
-    boolean isStaticFile = !(contentTypeMapping.keySet().stream().filter(fileFullName::endsWith)
+    boolean isStaticFile = !(fileSuffixList.stream().filter(fileFullName::endsWith)
                                                .findFirst().orElse("").isEmpty());
     String contentType = contentType(request);
 
