@@ -2,7 +2,7 @@ package cn.churen.biz.http.handler;
 
 import cn.churen.biz.http.check.*;
 import cn.churen.biz.http.result.Result;
-import cn.churen.biz.util.ContextHolder;
+import cn.churen.biz.util.AContextHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class IndexHandler extends HttpHandler {
 
   @Override public void service(Request request, Response response) throws Exception {
-    ContextHolder.clear();
+    AContextHolder.clear();
 
     response.setHeader("Access-Control-Allow-Credentials", "true");
     response.setHeader("Access-Control-Allow-Origin", "*");
@@ -93,7 +93,7 @@ public class IndexHandler extends HttpHandler {
   }
 
   public static Map<String, String> getParameters(Request request) {
-    Map<String, String> map = ContextHolder.get(ContextHolder.RC.PARAMETER.name(), Map.class);
+    Map<String, String> map = AContextHolder.get(AContextHolder.RC.PARAMETER.name(), Map.class);
     if (null == map) {
       map = new HashMap<>();
       Map<String, String[]> parameters = request.getParameterMap();
@@ -101,13 +101,13 @@ public class IndexHandler extends HttpHandler {
         String[] v = parameters.get(k);
         map.put(k, StringUtils.join(Arrays.asList(v), ""));
       }
-      ContextHolder.set(ContextHolder.RC.PARAMETER.name(), map);
+      AContextHolder.set(AContextHolder.RC.PARAMETER.name(), map);
     }
     return map;
   }
 
   public static String getRaw(Request request) {
-    String raw = ContextHolder.getOrDefault(ContextHolder.RC.RAW.name(), String.class, "{}");
+    String raw = AContextHolder.getOrDefault(AContextHolder.RC.RAW.name(), String.class, "{}");
     try {
       if (StringUtils.isBlank(raw)) {
         String contentType = request.getContentType();

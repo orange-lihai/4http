@@ -10,72 +10,74 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class ContextHolder {
+public class AContextHolder {
   public enum RC {
     DATA_SOURCE("dataSource"),
     TRANSACTION("Transaction"),
     PARAMETER("parameter"),
     RAW("parameter"),
     MODULE_ID("moduleId");
-    RC(String dataSource) {}
+
+    public String code;
+    RC(String code) { this.code = code; }
   }
 
   private static final ThreadLocal<Map<String, Object>> context = new ThreadLocal<>();
-  private static Logger logger = Grizzly.logger(ContextHolder.class);
+  private static Logger logger = Grizzly.logger(AContextHolder.class);
 
 	public static void clear() {
-		Map<String, Object> tmp = ContextHolder.context.get();
+		Map<String, Object> tmp = AContextHolder.context.get();
 		try {
       if (null != tmp.get(RC.DATA_SOURCE.name())) {
         Connection conn = (Connection) tmp.get(RC.DATA_SOURCE.name());
         conn.close();
       }
 
-      ContextHolder.context.set(null);
+      AContextHolder.context.set(null);
       tmp.clear();
     } catch (Exception ex) {}
 	}
 
 	public static Map data() {
-		return ContextHolder.context.get();
+		return AContextHolder.context.get();
 	}
 
 
   @SuppressWarnings({"unchecked"})
   public static <T> T get(String key, Class<T> clazz) {
-    if (null == ContextHolder.context.get()) {
-      ContextHolder.init();
+    if (null == AContextHolder.context.get()) {
+      AContextHolder.init();
     }
-    Object o = ContextHolder.context.get().get(key);
+    Object o = AContextHolder.context.get().get(key);
     return (null != o && o.getClass().isAssignableFrom(clazz)) ? (T) o : null;
   }
 
   @SuppressWarnings({"unchecked"})
   public static <T> T getOrDefault(String key, Class<T> clazz, Object defaultValue) {
-    Object rtn = ContextHolder.get(key, clazz);
+    Object rtn = AContextHolder.get(key, clazz);
     return rtn == null ? (T) defaultValue : (T) rtn;
   }
 
 	public static void init() {
-		ContextHolder.clear();
-		ContextHolder.context.set(new HashMap<>());
+		AContextHolder.clear();
+		AContextHolder.context.set(new HashMap<>());
 	}
 
 	public static void set(Map<String, Object> entries) {
-		ContextHolder.context.get().putAll(entries);
+		AContextHolder.context.get().putAll(entries);
 	}
 
 	public static void set(String key, Object value) {
-		ContextHolder.context.get().put(key, value);
+		AContextHolder.context.get().put(key, value);
 	}
 
 	public static <T> T use(Supplier<T> task, Map<String, Object> replace) {
 		try {
-			ContextHolder.init();
-			ContextHolder.set(replace);
+			AContextHolder.init();
+			AContextHolder.set(replace);
 			return task.get();
 		} finally {
-			ContextHolder.clear();
+			AContextHolder.clear();
 		}
 	}
 
@@ -84,11 +86,11 @@ public class ContextHolder {
   public static Connection getConnection() {
     Connection conn = null;
     try {
-      conn = ContextHolder.get(ContextHolder.RC.DATA_SOURCE.name(), Connection.class);
+      conn = AContextHolder.get(AContextHolder.RC.DATA_SOURCE.name(), Connection.class);
       if (null == conn) {
         conn = Application.dataSource.getConnection();
         conn.setAutoCommit(false);
-        ContextHolder.set(ContextHolder.RC.DATA_SOURCE.name(), conn);
+        AContextHolder.set(AContextHolder.RC.DATA_SOURCE.name(), conn);
       }
     } catch (Exception ex) {
       logger.log(Level.SEVERE, ex.getMessage(), ex);

@@ -1,8 +1,10 @@
 package cn.churen.biz.http.handler;
 
+import cn.churen.biz.http.check.MethodInvoke;
 import cn.churen.biz.http.org.AModule;
+import cn.churen.biz.service.ModuleService;
 import cn.churen.biz.util.ACollectionUtil;
-import cn.churen.biz.util.ContextHolder;
+import cn.churen.biz.util.AContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.grizzly.http.server.Request;
 
@@ -56,22 +58,18 @@ public class PageGenerator {
     String raw = IndexHandler.getRaw(request);
     AQuery query = (new Gson()).fromJson(raw, AQuery.class);
     */
-    String moduleId = parameters.get(ContextHolder.RC.MODULE_ID.name());
+    String moduleId = parameters.get(AContextHolder.RC.MODULE_ID.code);
     if (StringUtils.isBlank(moduleId)) {
       s.append("... ...");
     } else {
       // s.append("hello, world!");
-      s.append(generateDiv(moduleId));
+      AModule m = MethodInvoke.getInstance().getServiceClazzMap(ModuleService.class).getAdminAModule(moduleId);
+      s.append(m.getDiv().outerHtml());
     }
-    wrapperWith(s, HtmlTag.FONT, null);
+    // wrapperWith(s, HtmlTag.FONT, null);
     wrapperWith(s, HtmlTag.BODY, null);
     s.insert(0, wrapperWith(new StringBuilder(), HtmlTag.HEAD, null));
     wrapperWith(s, HtmlTag.HTML, null);
     return s.toString();
-  }
-
-  public static String generateDiv(String moduleId) {
-    AModule m = new AModule();
-    return "";
   }
 }

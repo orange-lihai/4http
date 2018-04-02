@@ -29,7 +29,17 @@ public class MethodInvoke {
 
   private MethodInvoke() {
     matchAllControllerMethod();
+    matchAllService();
   }
+
+  private void matchAllService() {
+    Reflections reflections = new Reflections("cn.churen.biz");
+    Set<Class<?>> annotated = reflections.getTypesAnnotatedWith(AService.class);
+    for (Class<?> c : annotated) {
+      CheckUtil.createInstance(c);
+    }
+  }
+
   private Map<String, ControllerMethod> matchAllControllerMethod() {
     ConfigurationBuilder methodConfigBuilder =
         new ConfigurationBuilder().setUrls(ClasspathHelper.forPackage("cn.churen.biz.controller"))
@@ -75,7 +85,9 @@ public class MethodInvoke {
 
   @SuppressWarnings({"unchecked"})
   public static <T> T setServiceClazzMap(Class<T> clazz, Object service) {
-    if (null != clazz && null != service && service.getClass().isAssignableFrom(clazz)) {
+    if (null != clazz && null != service
+      // && service.getClass().isAssignableFrom(clazz)
+    ) {
       return (T) serviceClazzMap.put(clazz, service);
     } else {
       return null;

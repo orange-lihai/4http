@@ -3,7 +3,7 @@ package cn.churen.biz.util;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-public class JUtil {
+public class AJavaUtil {
 
   public static URL[] queryClassPath() {
     URL[] urls = ((URLClassLoader) (ClassLoader.getSystemClassLoader())).getURLs();

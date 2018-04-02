@@ -6,29 +6,29 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class GlobalHolder {
+public class AGlobalHolder {
 
   private static final Map<String, Object> global = new HashMap<>();
-  private static Logger logger = Grizzly.logger(GlobalHolder.class);
+  private static Logger logger = Grizzly.logger(AGlobalHolder.class);
 
   @SuppressWarnings({"unchecked"})
   public static <T> T get(String key, Class<T> clazz) {
-    Object o = GlobalHolder.global.get(key);
+    Object o = AGlobalHolder.global.get(key);
     return (null != o && o.getClass().isAssignableFrom(clazz)) ? (T) o : null;
   }
 
   @SuppressWarnings({"unchecked"})
   public static <T> T getOrDefault(String key, Class<T> clazz, Object defaultValue) {
-    Object rtn = GlobalHolder.get(key, clazz);
+    Object rtn = AGlobalHolder.get(key, clazz);
     return rtn == null ? (T) defaultValue : (T) rtn;
   }
 
 	public static void set(Map<String, Object> entries) {
-		GlobalHolder.global.putAll(entries);
+		AGlobalHolder.global.putAll(entries);
 	}
 
 	public static void set(String key, Object value) {
-		GlobalHolder.global.put(key, value);
+		AGlobalHolder.global.put(key, value);
 	}
 
 	// ... ... ... ... ...

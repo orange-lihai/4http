@@ -2,7 +2,7 @@ package cn.churen.biz.http.check;
 
 import cn.churen.biz.dao.crud.table.ATableColumn;
 import cn.churen.biz.service.*;
-import cn.churen.biz.util.ContextHolder;
+import cn.churen.biz.util.AContextHolder;
 import net.sf.cglib.core.internal.Function;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -67,7 +67,7 @@ public class ServiceProxy implements MethodInterceptor {
           return sourceFunc.apply(sourceFuncParameter);
         }
       } catch (Throwable throwable) {
-        ContextHolder.rollbackConnection();
+        AContextHolder.rollbackConnection();
         logger.log(Level.SEVERE, throwable.getMessage(), throwable.fillInStackTrace());
         return null;
       }
@@ -93,7 +93,7 @@ public class ServiceProxy implements MethodInterceptor {
           sqlList.add(String.valueOf(args[i]));
         }
       }
-      Connection conn = ContextHolder.getConnection();
+      Connection conn = AContextHolder.getConnection();
       statement = conn.createStatement();
       for (String s : sqlList) {
         ResultSet _rs = statement.executeQuery(s);
@@ -184,14 +184,14 @@ public class ServiceProxy implements MethodInterceptor {
     Object o = null;
     Connection conn = null;
     try {
-      Boolean tranExists = ContextHolder.getOrDefault(
-          ContextHolder.RC.TRANSACTION.name(), Boolean.class, false);
+      Boolean tranExists = AContextHolder.getOrDefault(
+          AContextHolder.RC.TRANSACTION.name(), Boolean.class, false);
       if (tranExists) {
         o = callable.call();
       } else {
-        conn = ContextHolder.getConnection();
+        conn = AContextHolder.getConnection();
         conn.setAutoCommit(false);
-        ContextHolder.set(ContextHolder.RC.TRANSACTION.name(), true);
+        AContextHolder.set(AContextHolder.RC.TRANSACTION.name(), true);
         o = callable.call();
         conn.commit();
       }
@@ -206,7 +206,7 @@ public class ServiceProxy implements MethodInterceptor {
     } finally {
       try {
         if (null != conn) { conn.close(); }
-        ContextHolder.set(ContextHolder.RC.TRANSACTION.name(), false);
+        AContextHolder.set(AContextHolder.RC.TRANSACTION.name(), false);
       } catch (SQLException e) {
         logger.log(Level.SEVERE, e.getMessage(), e);
       }

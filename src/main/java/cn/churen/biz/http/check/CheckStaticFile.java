@@ -1,7 +1,7 @@
 package cn.churen.biz.http.check;
 
 import cn.churen.biz.http.result.Result;
-import cn.churen.biz.util.BUtil;
+import cn.churen.biz.util.ABeanUtil;
 import org.glassfish.grizzly.http.server.Request;
 
 import java.util.Arrays;
@@ -17,7 +17,7 @@ public class CheckStaticFile implements ICheck {
       , ".gif", ".png", ".bmp", ".ico", ".jpeg"
       , ".mp3", ".mp4"
   );
-  public static Map<String, String> contentTypeMapping = BUtil.toMap(
+  public static Map<String, String> contentTypeMapping = ABeanUtil.toMap(
     ".html", "text/html"
     , ".css", "text/css"
     , ".js", "application/javascript"
