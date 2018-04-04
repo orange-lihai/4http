@@ -1,5 +1,8 @@
-package cn.churen.biz.dao.crud.table;
+package cn.churen.biz.dao.crud.table.meta;
 
+import cn.churen.biz.dao.crud.table.ATable;
+import cn.churen.biz.dao.crud.table.ATableColumn;
+import cn.churen.biz.dao.crud.table.ITable;
 import lombok.Getter;
 import lombok.Setter;
 

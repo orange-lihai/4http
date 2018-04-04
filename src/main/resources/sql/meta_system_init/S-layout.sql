@@ -28,7 +28,7 @@ prepare strsql from @strsql;
 execute strsql;
 while row_count() > 0 do
   set lev=lev+1;
-  set @strsql = CONCAT('INSERT temp_tree' ,' SELECT ','t.',idName,',' ,' t.',pidName,',' ,lev, ' FROM ', tableName,' t join temp_tree a on ','t.',pidName,'=a.ID And levv=', `level`-1);
+  set @strsql = CONCAT('INSERT temp_tree' ,' SELECT ','t.',idName,',' ,' t.',pidName,',' ,lev, ' FROM ', tableName,' t join temp_tree a on ','t.',pidName,'=a.ID And a.level=', lev-1);
   prepare strsql from @strsql;
   execute strsql;
 end while ;
@@ -47,6 +47,7 @@ execute strsql;
 set idStr = @ids;
 end;
 
+-- -----------------------------------------------------------------------------------------------------------------------
 
 -- -----------------------------------------------------------------------------------------------------------------------
 -- truncate table tb_system;
@@ -72,6 +73,7 @@ create table tb_page (
   name varchar(32),
   show_name varchar(128),
   url varchar(128),
+  parameter_url varchar(2048),
   memo varchar(1024),
   system_id varchar(32) comment '',
   div_id varchar(32),
@@ -85,7 +87,7 @@ create table tb_file (
   id varchar(32) primary key comment 'primary key',
   file_type varchar(32) comment 'css, js, gif ...',
   file_url varchar(512),
-  is_default int default 0, 
+  is_default int default 0,
   system_id varchar(32) comment '',
   owner varchar(32) comment ''
 );
@@ -108,12 +110,13 @@ create table tb_div (
   sid varchar(32) comment 'sibling id',
   name varchar(32) comment '',
   show_name varchar(32) comment '',
-  data_selector varchar(1024) comment 'examples: name.key1.key2, name[1].key3, ... ', 
+  data_selector varchar(1024) comment 'examples: name.key1.key2, name[1].key3, ... ',
   html_code text comment 'inner html code',
   css_code longtext comment 'css style code',
   attrs longtext comment 'div attributes',
   system_id varchar(32) comment '',
-  div_type varchar(32) comment 'page, div, modal, hide, float ...'
+  div_type varchar(32) comment 'page, div, modal, hide, float ...',
+  order_num int default 0
 );
 
 -- truncate table tb_div_css;
@@ -150,12 +153,13 @@ create table tb_css (
 -- select * from tb_api;
 create table tb_api (
   id varchar(32) primary key comment 'primary key',
-  name varchar(64) comment 'english name',
+  name varchar(64) unique comment 'english name',
   show_name varchar(128) comment '名称',
   data_type varchar(8) comment '数据类型: SQL, HTTP, CONSTANTS ... ',
   sql_code longtext comment 'sql code',
   http_statement longtext comment 'http url and parameters',
   constant_data longtext comment 'json',
-  owner varchar(32) comment ''
+  owner varchar(32) comment '',
+  system_id varchar(32)
 );
 

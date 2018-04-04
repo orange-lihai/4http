@@ -1,17 +1,21 @@
 package cn.churen.biz.http.handler;
 
+import cn.churen.biz.dao.crud.table.meta.TBDiv;
+import cn.churen.biz.dao.crud.table.meta.TBPage;
+import cn.churen.biz.http.check.CheckStaticFile;
 import cn.churen.biz.http.check.MethodInvoke;
-import cn.churen.biz.http.org.AModule;
-import cn.churen.biz.service.ModuleService;
+import cn.churen.biz.service.TableService;
+import cn.churen.biz.service.meta.AConstants;
+import cn.churen.biz.service.meta.DivService;
+import cn.churen.biz.util.ABasicUtil;
 import cn.churen.biz.util.ACollectionUtil;
-import cn.churen.biz.util.AContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.grizzly.http.server.Request;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class PageGenerator {
-
   public enum HtmlTag {
     HTML("html"),
     BODY("body"),
@@ -52,19 +56,30 @@ public class PageGenerator {
   }
 
   public static String generatePage(Request request) {
+    String fileFullName = CheckStaticFile.fileFullName(request);
     StringBuilder s = new StringBuilder();
     Map<String, String> parameters = IndexHandler.getParameters(request);
     /*
     String raw = IndexHandler.getRaw(request);
     AQuery query = (new Gson()).fromJson(raw, AQuery.class);
     */
-    String moduleId = parameters.get(AContextHolder.RC.MODULE_ID.code);
-    if (StringUtils.isBlank(moduleId)) {
+    Map<String, String> pageParam = new HashMap<>();
+    pageParam.put("url", fileFullName);
+    TBPage p =  MethodInvoke.getServiceClazzMap(TableService.class)
+                            .queryOne(AConstants.sql.queryPageByName.code, pageParam, TBPage.class);
+
+    String divId = null != p ? ABasicUtil.getStr(p.getDivId(), "") : "";
+    if (StringUtils.isBlank(divId)) {
       s.append("... ...");
     } else {
       // s.append("hello, world!");
-      AModule m = MethodInvoke.getInstance().getServiceClazzMap(ModuleService.class).getAdminAModule(moduleId);
-      s.append(m.getDiv().outerHtml());
+      TBDiv div = MethodInvoke.getServiceClazzMap(DivService.class)
+                              .queryDivRecursive(divId);
+      if (null != div) {
+        s.append(div.outerHtml());
+      } else {
+        s.append("*** ***");
+      }
     }
     // wrapperWith(s, HtmlTag.FONT, null);
     wrapperWith(s, HtmlTag.BODY, null);

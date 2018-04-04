@@ -1,7 +1,7 @@
 package cn.churen.biz.service;
 
 import cn.churen.biz.dao.crud.Query;
-import cn.churen.biz.dao.crud.table.TBSystem;
+import cn.churen.biz.dao.crud.table.meta.TBSystem;
 import cn.churen.biz.http.check.AInjection;
 import cn.churen.biz.http.check.AService;
 

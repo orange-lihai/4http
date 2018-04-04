@@ -83,6 +83,7 @@ public class ServiceProxy implements MethodInterceptor {
     }
 
     Statement statement = null;
+    Connection conn = null;
     try {
       Object[] args = sourceFuncParameter.args;
       Parameter[] parameters = sourceFuncParameter.method.getParameters();
@@ -93,12 +94,12 @@ public class ServiceProxy implements MethodInterceptor {
           sqlList.add(String.valueOf(args[i]));
         }
       }
-      Connection conn = AContextHolder.getConnection();
+      conn = AContextHolder.getConnection();
       statement = conn.createStatement();
       for (String s : sqlList) {
         ResultSet _rs = statement.executeQuery(s);
         Class<?> _clazz = getADaoMethodReturnType(sourceFuncParameter);
-        rs.add(getADaoMethodObject(_rs, _clazz));
+        rs.addAll(getADaoMethodObject(_rs, _clazz));
         _rs.close();
       }
     } catch (Exception ex) {
@@ -108,6 +109,7 @@ public class ServiceProxy implements MethodInterceptor {
         if (null != statement && !statement.isClosed()) {
           statement.close();
         }
+        if (null != conn) { conn.close(); }
       } catch (SQLException e) {
         logger.log(Level.SEVERE, e.getMessage(), e);
       }
@@ -136,11 +138,13 @@ public class ServiceProxy implements MethodInterceptor {
       obj = bean.newInstance();
       Field[] fields = bean.getDeclaredFields();
       for (Field f : fields) {
+        if (f.getModifiers() >= 8) { continue; }
         String name = f.getName();
         ATableColumn columnAnnotation = f.getAnnotation(ATableColumn.class);
         if (null != columnAnnotation) {
           name = columnAnnotation.name();
         }
+        if (!map.containsKey(name)) { continue; }
         f.setAccessible(true);
         f.set(obj, map.get(name));
       }

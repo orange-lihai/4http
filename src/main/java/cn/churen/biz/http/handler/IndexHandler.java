@@ -23,6 +23,7 @@ public class IndexHandler extends HttpHandler {
 
   @Override public void service(Request request, Response response) throws Exception {
     AContextHolder.clear();
+    MethodInvoke.getInstance();
 
     response.setHeader("Access-Control-Allow-Credentials", "true");
     response.setHeader("Access-Control-Allow-Origin", "*");
