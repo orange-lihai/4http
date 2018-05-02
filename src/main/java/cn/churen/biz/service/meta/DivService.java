@@ -5,6 +5,7 @@ import cn.churen.biz.http.check.AService;
 import cn.churen.biz.http.check.MethodInvoke;
 import cn.churen.biz.service.TableService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -67,7 +68,12 @@ public class DivService {
   }
 
   private void tidy(TBDiv d) {
-
+    if (null == d) { return; }
+    if (StringUtils.isNotBlank(d.getCssCode())) {
+      for (String st : d.getCssCode().split(";")) {
+        d.appendCssStyle(st.split(":")[0], st.split(":")[1]);
+      }
+    }
   }
 
   public String outerHtml() {

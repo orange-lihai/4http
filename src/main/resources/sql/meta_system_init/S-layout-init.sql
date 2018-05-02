@@ -24,15 +24,15 @@ values (@pageSysList, null, 'page_sys_list', 'page of system list', '/system/lis
 ;
 -- ---------------------------------------------------------------------------------------------------------------------------
 
-set @divId = 'page_sys_list_div';
-set @idStr = '';
-call pd_childrens('tb_div', 'id', 'pid', @divId, 1, @idStr);
-delete from tb_div where find_in_set(id, @idStr) = 1;
+  set @divId = 'page_sys_list_div';
+  set @idStr = '';
+  call pd_childrens('tb_div', 'id', 'pid', @divId, 1, @idStr);
+  delete from tb_div where find_in_set(id, @idStr) = 1;
 
-insert into tb_div(id, pid, sid, name, show_name, data_selector, html_code, css_code, attrs, system_id, div_type)
-values (@divId, null, null, 'page_sys_list_div', 'page_sys_list_div', null, null, null, null, @sysId, 'div')
-;
-update tb_page set div_id = @divId where system_id = @sysId and id = @pageSysList;
+  insert into tb_div(id, pid, sid, name, show_name, data_selector, html_code, css_code, attrs, system_id, div_type)
+  values (@divId, null, null, 'page_sys_list_div', 'page_sys_list_div', null, null, null, null, @sysId, 'div')
+  ;
+  update tb_page set div_id = @divId where system_id = @sysId and id = @pageSysList;
 
 -- ---------------------------------------------------------------------------------------------------------------------------
 set @divIdG = 'page_sys_generator_div';
@@ -49,9 +49,9 @@ update tb_div set css_code = concat(css_code, 'flex-direction: column;') where i
 update tb_div set css_code = concat(css_code, 'height: 100%;') where id = @divIdG;
 
 insert into tb_div(id, pid, sid, name, show_name, data_selector, html_code, css_code, attrs, system_id, div_type)
-values ('psgd_1', @divIdG, null, 'psgd_1', 'psgd_1', '', '', '', '', @sysId, 'div')
-, ('psgd_2', @divIdG, null, 'psgd_2', 'psgd_2', '', '', '', '', @sysId, 'div')
-, ('psgd_3', @divIdG, null, 'psgd_3', 'psgd_3', '', '', '', '', @sysId, 'div')
+values ('psgd_1', @divIdG, null, 'psgd_1', 'psgd_1', '', NULL, '', '', @sysId, 'div')
+, ('psgd_2', @divIdG, null, 'psgd_2', 'psgd_2', '', NULL, '', '', @sysId, 'div')
+, ('psgd_3', @divIdG, null, 'psgd_3', 'psgd_3', '', NULL, '', '', @sysId, 'div')
 ;
 update tb_div set css_code = concat(css_code, 'flex-grow: 1;') where id = 'psgd_2';
 update tb_div set css_code = concat(css_code, 'flex-shrink: 0;') where id = 'psgd_2';
